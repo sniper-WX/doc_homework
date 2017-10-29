@@ -15,7 +15,7 @@ class ExpData(object):
     def add_tag(self, tag):
         self.__tag_set.add(tag)
 
-    def data_cutting(self,train_ratio, test_ratio):
+    def data_cutting(self, train_ratio, test_ratio):
         choice = 'train'
         train_cnt = 0
         test_cnt = 0
@@ -37,7 +37,7 @@ class ExpData(object):
                     choice = 'train'
             else:
                 print('-----------erro logic---------------')
-        print('apply data_cutting with %s train data, %s test data'%(len(self.__train_data),len(self.__test_data)))
+        print('apply data_cutting with %s train data, %s test data' % (len(self.__train_data), len(self.__test_data)))
 
     def get_train_data(self):
         return self.__train_data
@@ -55,14 +55,14 @@ class DataIO(object):
     def load_raw_data(self, file_path):
         exp_data = ExpData()
         with open(file_path, encoding='utf-8') as raw_file:
-            i= 1
-            try :
+            i = 1
+            try:
                 for line in raw_file:
                     word_strings = line.strip().split()
                     exp_record = []
-                    i+=1
+                    i += 1
                     for word_string in word_strings:
-                        items = word_string.strip().rsplit(self.POS_Tag_SPLIT,maxsplit=1)
+                        items = word_string.strip().rsplit(self.POS_Tag_SPLIT, maxsplit=1)
                         try:
                             word, pos_tag = items
                         except Exception as e:
@@ -80,18 +80,17 @@ class DataIO(object):
                 print(e)
         return exp_data
 
-    def persit_data(self,target_data, file_path):
-        with open(file_path, 'w',encoding='utf-8') as out_file:
+    def persit_data(self, target_data, file_path):
+        with open(file_path, 'w', encoding='utf-8') as out_file:
             for data_item in target_data:
-                out_file.write('%s\n'%data_item)
+                out_file.write('%s\n' % data_item)
 
 
 if __name__ == '__main__':
-
     io_obj = DataIO()
     exp_data = io_obj.load_raw_data('C:\\Users\\Administrator\\Desktop\\raw_data.txt')
-    exp_data.apply_cross_validate(8,2)
-    io_obj.persit_data(exp_data.get_train_data(),'../data/train_data.txt')
+    exp_data.apply_cross_validate(8, 2)
+    io_obj.persit_data(exp_data.get_train_data(), '../data/train_data.txt')
     io_obj.persit_data(exp_data.get_test_data(), '../data/test_data.txt')
     io_obj.persit_data(exp_data.get_test_data(), '../data/tags_in_use.txt')
-    pass
+
