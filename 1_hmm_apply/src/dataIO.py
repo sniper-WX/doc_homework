@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-
+from hmm_core import HMMModel
 
 class ExpData(object):
     def __init__(self):
@@ -48,9 +48,19 @@ class ExpData(object):
     def get_all_tags(self):
         return self.__tag_set
 
+    def get_all_data(self):
+        return self.__data
+
 class DataIO(object):
     def __init__(self):
         self.POS_Tag_SPLIT = '/'
+
+    def load_formed_data(self,file_path):
+        exp_data = ExpData()
+        with open(file_path, encoding='utf-8') as raw_file:
+            for line in raw_file:
+                exp_data.add_exp_data(eval(line))
+        return exp_data
 
     def load_raw_data(self, file_path):
         exp_data = ExpData()
@@ -83,7 +93,28 @@ class DataIO(object):
     def persit_data(self, target_data, file_path):
         with open(file_path, 'w', encoding='utf-8') as out_file:
             for data_item in target_data:
-                out_file.write('%s\n' % data_item)
+                out_file.write('%s\n' % str(data_item))
+
+    def persist_model(self, model, file_path):
+        with open(file_path, 'w', encoding='utf-8') as out_file:
+            # observes = model.get_observes()
+            # out_file.write('%s\n'%str(len(observes)))
+            # for observe in observes:
+            #     out_file.write('%s\n',str(observes))
+            parameters = model.get_parameters()
+            out_file.write('%s'%str(parameters))
+
+    def load_model(self, model_file_path):
+        model = HMMModel()
+        with open(model_file_path, encoding='utf-8') as model_file:
+            parameters = eval(model_file.read())
+            model.set_hiden_state_transfer(parameters[0])
+            model.set_hiden_observe_transfer(parameters[1])
+            model.set_init_hiden(parameters[2])
+            model.set_observes(parameters[3])
+            model.set_hiden_states(parameters[4])
+        return model
+
 
 
 if __name__ == '__main__':
