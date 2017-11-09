@@ -4,22 +4,27 @@ import numpy as  np
 class HMMModel(object):
     def __init__(self):
         self.__hiden_state_transfer= {}
-        self.__hiden_visible_transfer = {}
+        self.__hiden_observe_transfer = {}
         self.__init_hiden = {}
+        self.__observes = set()
+        self.__hiden_states = set()
 
 
     def train(self, train_data, pos_tags):
         init_state_cnt = {}#π
-        hiden_visible_cnt = {}#B
+        hiden_observe_cnt = {}#B
         hiden_transfer_cnt = {}#A
         #初始化初始状态概率
+        self.__hiden_states = set()
+        self.__observes = set()
         for pos_tag in pos_tags:
             self.__init_hiden[pos_tag] = float(0)
             self.__hiden_state_transfer[pos_tag] = {}
-            self.__hiden_visible_transfer[pos_tag] = {}
+            self.__hiden_observe_transfer[pos_tag] = {}
+            self.__hiden_states.add(pos_tags)
 
             hiden_transfer_cnt[pos_tag] = {}
-            hiden_visible_cnt[pos_tag] = {}
+            hiden_observe_cnt[pos_tag] = {}
             for pos_tag_1 in pos_tags:
                 hiden_transfer_cnt[pos_tag][pos_tag_1] = 0
                 self.__hiden_state_transfer[pos_tag][pos_tag_1] = float(0)
@@ -43,14 +48,17 @@ class HMMModel(object):
                     continue
 
                 #统计隐藏状态到观测状态的转移概率
-                if word_str not in hiden_visible_cnt[pos_tag]:
-                    hiden_visible_cnt[pos_tag][word_str] = 1
-                    self.__hiden_visible_transfer[pos_tag][word_str] = float(0)
+                if word_str not in hiden_observe_cnt[pos_tag]:
+                    hiden_observe_cnt[pos_tag][word_str] = 1
+                    self.__hiden_observe_transfer[pos_tag][word_str] = float(0)
                 else:
-                    hiden_visible_cnt[pos_tag][word_str] += 1
+                    hiden_observe_cnt[pos_tag][word_str] += 1
 
                 # 统计隐藏状态之间的转换
                 hiden_transfer_cnt[last_pos_tag][pos_tag] += 1
+
+                # 添加至观测状态集合
+                self.__observes.add(word_str)
 
             if record_cnt % 10000 == 0:
                 print('Trained %s records'% record_cnt)
@@ -65,16 +73,16 @@ class HMMModel(object):
             print(' %s::%s' % (state, self.__init_hiden[state]))
 
         #计算隐藏到观测状态概率
-        print("--------------------compute hiden_visible_cnt ----------------------")
-        for pos_tag in hiden_visible_cnt:
+        print("--------------------compute hiden_observe_cnt ----------------------")
+        for pos_tag in hiden_observe_cnt:
             pos_total_count = 0
             print('pos_tag:%s ===>'%pos_tag)
-            for word_str in hiden_visible_cnt[pos_tag]:
-                pos_total_count += hiden_visible_cnt[pos_tag][word_str]
-            for word_str in hiden_visible_cnt[pos_tag]:
-                current_word_cnt = hiden_visible_cnt[pos_tag][word_str]
-                self.__hiden_visible_transfer[pos_tag][word_str] = float(current_word_cnt)/pos_total_count
-                print(' %s::%s' % (word_str, self.__hiden_visible_transfer[pos_tag][word_str]),end='')
+            for word_str in hiden_observe_cnt[pos_tag]:
+                pos_total_count += hiden_observe_cnt[pos_tag][word_str]
+            for word_str in hiden_observe_cnt[pos_tag]:
+                current_word_cnt = hiden_observe_cnt[pos_tag][word_str]
+                self.__hiden_observe_transfer[pos_tag][word_str] = float(current_word_cnt)/pos_total_count
+                print(' %s::%s' % (word_str, self.__hiden_observe_transfer[pos_tag][word_str]),end='')
             print("")
 
         # 计算隐藏状态转移概率
@@ -101,6 +109,10 @@ class HMMModel(object):
 
         pass
 
-    def __viterbi_search(self):
-        pass
+    def __viterbi_search(self,words_seq):
+        seq_length = len(words_seq)
+        states_max_probs = [{}]*seq_length
+        states_path = [{}]*seq_length
+
+        
 
