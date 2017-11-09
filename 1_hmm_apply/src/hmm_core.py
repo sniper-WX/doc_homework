@@ -221,6 +221,7 @@ class HMMModel(object):
                 if max_prob > max_max_prob:
                     max_max_prob = max_prob
             #print('max_max_prob of word(%s):%s'%(cur_word,max_max_prob))
+            # 为防止max_prob溢出，统一调整同一时刻的max_prob
             if max_max_prob > 10000:
                 resize = 0.0001
             elif max_max_prob < 0.0001:
