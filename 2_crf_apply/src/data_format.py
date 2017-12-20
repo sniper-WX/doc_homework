@@ -5,15 +5,15 @@ if __name__ == '__main__':
     raw_file_name = '../data/data_nr.txt'
     train_file_name = '../data/train_data.txt'
     test_file_name = '../data/test_data.txt'
-    train_out_file = open(train_file_name,'w')
-    test_out_file = open(test_file_name,'w')
+    train_out_file = open(train_file_name,'w',encoding='utf-8')
+    test_out_file = open(test_file_name,'w',encoding='utf-8')
     test_ratio = 2#最大10
-    with open(raw_file_name,'r') as in_file:
+    with open(raw_file_name,'r',encoding='utf-8') as in_file:
         i = 1
         for line in in_file:
             i += 1
-            if i == 1000 :
-                break
+            # if i == 1000 :
+            #     break
             random_int = random.randint(1, 10)
             if random_int <= test_ratio:
                 out_file = test_out_file
@@ -27,3 +27,5 @@ if __name__ == '__main__':
                     out_file.write('%s %s\n'%(word,'B'))
                 else:
                     out_file.write('%s %s\n'%(word,'O'))
+
+            out_file.write('\n')
